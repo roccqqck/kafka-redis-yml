@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.version: 1.23.0 (bc7d9f4f)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kafka-ui
+  name: kafka-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-ui
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.version: 1.23.0 (bc7d9f4f)
+      creationTimestamp: null
+      labels:
+        app: kafka-ui
+    spec:
+      containers:
+        - env:
+            - name: JVM_OPTS
+              value: -Xms32M -Xmx64M
+            - name: KAFKA_BROKERCONNECT
+              value: "fcb-kafka:9092"
+            - name: SERVER_SERVLET_CONTEXTPATH
+              value: /
+          image: obsidiandynamics/kafdrop:3.27.0
+          name: kafka-ui
+          ports:
+            - containerPort: 9000
+          readinessProbe:
+            tcpSocket:
+              port: 9000
+            timeoutSeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 9000
+            timeoutSeconds: 5
+            periodSeconds: 5
+            initialDelaySeconds: 30          
+          resources:
+            limits:
+              cpu: '1'
+              memory: 258M
+            requests:
+              cpu: 100m
+              memory: 128M
+      restartPolicy: Always
+status: {}
